@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: cobrancas_whpp
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/cobranca_db?useSSL=false&serverTimezone=America/Sao_Paulo
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+
+server:
+  port: 8080
