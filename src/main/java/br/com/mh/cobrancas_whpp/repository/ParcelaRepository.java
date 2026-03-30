@@ -14,4 +14,6 @@ public interface ParcelaRepository extends JpaRepository<Parcela, Long> {
     List<Parcela> findByDataVencimento(LocalDate dataVencimento);
 
     List<Parcela> findByDataVencimentoAndStatus(LocalDate dataVencimento, ParcelaStatus status);
+
+    List<Parcela> findByStatusNotAndDataVencimentoLessThanEqual(ParcelaStatus status, LocalDate data);
 }
