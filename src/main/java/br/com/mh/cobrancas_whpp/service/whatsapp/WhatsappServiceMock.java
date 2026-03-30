@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class WhatsappServiceMock implements WhatsappService {
 
-    @Override
     public void enviarMensagem(String telefoneDestino, String mensagem) {
         log.info("====================================");
         log.info("SIMULAÇÃO DE ENVIO WHATSAPP");

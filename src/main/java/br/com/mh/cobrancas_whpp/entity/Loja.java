@@ -40,5 +40,5 @@ public class Loja {
 
     @Builder.Default
     @Column(nullable = false)
-    private Boolean receberResumoWhatsapp = false;
+    private Boolean receberResumoWhatsapp = true;
 }
