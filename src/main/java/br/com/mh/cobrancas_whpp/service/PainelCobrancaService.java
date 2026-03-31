@@ -1,9 +1,11 @@
 package br.com.mh.cobrancas_whpp.service;
 
 import br.com.mh.cobrancas_whpp.controller.dto.CobrancaPainelResponse;
+import br.com.mh.cobrancas_whpp.entity.Cliente;
 import br.com.mh.cobrancas_whpp.entity.Parcela;
 import br.com.mh.cobrancas_whpp.entity.ParcelaStatus;
 import br.com.mh.cobrancas_whpp.repository.ParcelaRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -11,36 +13,34 @@ import java.util.Comparator;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class PainelCobrancaService {
 
     private final ParcelaRepository parcelaRepository;
-    private final MensagemCobrancaService mensagemCobrancaService;
-
-    public PainelCobrancaService(ParcelaRepository parcelaRepository,
-                                 MensagemCobrancaService mensagemCobrancaService) {
-        this.parcelaRepository = parcelaRepository;
-        this.mensagemCobrancaService = mensagemCobrancaService;
-    }
 
     public List<CobrancaPainelResponse> listarCobrancasDoPainel() {
         LocalDate hoje = LocalDate.now();
 
-        List<Parcela> parcelas = parcelaRepository.findAll().stream()
-                .filter(parcela -> parcela.getStatus() != ParcelaStatus.PAGA)
-                .filter(parcela -> !parcela.getDataVencimento().isAfter(hoje))
-                .sorted(Comparator.comparing(Parcela::getDataVencimento))
-                .toList();
-
-        return parcelas.stream()
+        return parcelaRepository
+                .findByStatusNotAndDataVencimentoLessThanEqual(ParcelaStatus.PAGA, hoje)
+                .stream()
+                .filter(parcela -> parcela.getDivida() != null && parcela.getDivida().getCliente() != null)
+                .sorted(Comparator.comparing(Parcela::getDataVencimento)
+                        .thenComparing(Parcela::getId))
                 .map(parcela -> montarResponse(parcela, hoje))
                 .toList();
     }
 
     private CobrancaPainelResponse montarResponse(Parcela parcela, LocalDate hoje) {
-        String status = definirStatusTela(parcela, hoje);
-        String horarioSugerido = "09:00";
+        Cliente cliente = parcela.getDivida().getCliente();
 
-        String mensagem = mensagemCobrancaService.gerarMensagem(parcela);
+        String clienteNome = cliente.getNome();
+        String lojaNome = cliente.getLoja() != null ? cliente.getLoja().getNome() : "Sem loja";
+        String telefone = cliente.getTelefone();
+        String statusTela = calcularStatusTela(parcela, hoje);
+        String horarioSugerido = "08:00";
+
+        String mensagem = montarMensagemCobranca(clienteNome, parcela.getValorParcela(), parcela.getDataVencimento());
 
         String textoAgenda = """
                 Título: Cobrar %s - %s
@@ -49,29 +49,30 @@ public class PainelCobrancaService {
                 Lembrete: 1 hora antes
                 Descrição: Parcela de R$ %s. Telefone: %s
                 """.formatted(
-                parcela.getDivida().getCliente().getNome(),
-                parcela.getDivida().getCliente().getLoja().getNome(),
+                clienteNome,
+                lojaNome,
                 parcela.getDataVencimento(),
                 horarioSugerido,
-                parcela.getValor(),
-                parcela.getDivida().getCliente().getTelefone()
+                parcela.getValorParcela(),
+                telefone
         );
 
         return new CobrancaPainelResponse(
                 parcela.getId(),
-                parcela.getDivida().getCliente().getNome(),
-                parcela.getDivida().getCliente().getLoja().getNome(),
-                parcela.getDivida().getCliente().getTelefone(),
-                parcela.getValor(),
+                cliente.getId(),
+                clienteNome,
+                lojaNome,
+                telefone,
+                parcela.getValorParcela(),
                 parcela.getDataVencimento(),
-                status,
+                statusTela,
                 horarioSugerido,
                 mensagem,
                 textoAgenda
         );
     }
 
-    private String definirStatusTela(Parcela parcela, LocalDate hoje) {
+    private String calcularStatusTela(Parcela parcela, LocalDate hoje) {
         if (parcela.getStatus() == ParcelaStatus.PAGA) {
             return "PAGA";
         }
@@ -85,5 +86,13 @@ public class PainelCobrancaService {
         }
 
         return "PENDENTE";
+    }
+
+    private String montarMensagemCobranca(String nomeCliente, java.math.BigDecimal valor, LocalDate dataVencimento) {
+        return """
+                Olá, %s.
+                Passando para lembrar que há um pagamento no valor de R$ %s com vencimento em %s.
+                Caso já tenha efetuado, desconsidere esta mensagem.
+                """.formatted(nomeCliente, valor, dataVencimento);
     }
 }

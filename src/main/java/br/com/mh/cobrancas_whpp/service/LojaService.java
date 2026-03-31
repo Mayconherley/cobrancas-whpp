@@ -1,11 +1,13 @@
 package br.com.mh.cobrancas_whpp.service;
 
 import br.com.mh.cobrancas_whpp.controller.dto.LojaRequest;
+import br.com.mh.cobrancas_whpp.controller.dto.LojaResponse;
 import br.com.mh.cobrancas_whpp.entity.Loja;
 import br.com.mh.cobrancas_whpp.repository.LojaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -16,16 +18,21 @@ public class LojaService {
 
     private final LojaRepository lojaRepository;
 
-    public List<Loja> listarTodas() {
-        return lojaRepository.findAll();
+    public List<LojaResponse> listarTodas() {
+        return lojaRepository.findAll()
+                .stream()
+                .map(this::toResponse)
+                .toList();
     }
 
-    public Loja buscarPorId(Long id) {
-        return lojaRepository.findById(id)
+    public LojaResponse buscarPorId(Long id) {
+        Loja loja = lojaRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Loja não encontrada"));
+
+        return toResponse(loja);
     }
 
-    public Loja criar(LojaRequest request) {
+    public LojaResponse criar(LojaRequest request) {
         Loja loja = Loja.builder()
                 .nome(request.nome())
                 .nomeResponsavel(request.nomeResponsavel())
@@ -35,11 +42,13 @@ public class LojaService {
                 .receberResumoWhatsapp(request.receberResumoWhatsapp())
                 .build();
 
-        return lojaRepository.save(loja);
+        Loja salva = lojaRepository.save(loja);
+        return toResponse(salva);
     }
 
-    public Loja atualizar(Long id, LojaRequest request) {
-        Loja loja = buscarPorId(id);
+    public LojaResponse atualizar(Long id, LojaRequest request) {
+        Loja loja = lojaRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Loja não encontrada"));
 
         loja.setNome(request.nome());
         loja.setNomeResponsavel(request.nomeResponsavel());
@@ -48,6 +57,26 @@ public class LojaService {
         loja.setAtivo(request.ativo());
         loja.setReceberResumoWhatsapp(request.receberResumoWhatsapp());
 
-        return lojaRepository.save(loja);
+        Loja atualizada = lojaRepository.save(loja);
+        return toResponse(atualizada);
+    }
+
+    @Transactional
+    public void deletar(Long id) {
+        Loja loja = lojaRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Loja não encontrada"));
+        lojaRepository.delete(loja);
+    }
+
+    private LojaResponse toResponse(Loja loja) {
+        return new LojaResponse(
+                loja.getId(),
+                loja.getNome(),
+                loja.getNomeResponsavel(),
+                loja.getTelefoneWhatsapp(),
+                loja.getEmail(),
+                loja.getAtivo(),
+                loja.getReceberResumoWhatsapp()
+        );
     }
 }

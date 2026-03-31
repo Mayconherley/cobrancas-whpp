@@ -2,7 +2,6 @@ package br.com.mh.cobrancas_whpp.service;
 
 import br.com.mh.cobrancas_whpp.controller.dto.CobrancaClienteResumoResponse;
 import br.com.mh.cobrancas_whpp.controller.dto.CobrancaDiariaLojaResponse;
-import br.com.mh.cobrancas_whpp.service.whatsapp.WhatsappService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +14,6 @@ import java.util.stream.Collectors;
 public class EnvioResumoWhatsappService {
 
     private final ResumoCobrancaService resumoCobrancaService;
-    private final WhatsappService whatsappService;
 
     public void enviarResumoDoDia(LocalDate dataReferencia) {
         List<CobrancaDiariaLojaResponse> resumos = resumoCobrancaService.gerarResumoDoDia(dataReferencia);
@@ -37,10 +35,7 @@ public class EnvioResumoWhatsappService {
                         .append("\n\n");
             }
 
-            whatsappService.enviarMensagem(
-                    resumo.telefoneWhatsappLoja(),
-                    mensagem.toString()
-            );
+
         }
     }
 

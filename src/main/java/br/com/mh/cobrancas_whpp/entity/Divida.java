@@ -49,8 +49,7 @@ public class Divida {
     @Column(nullable = false, length = 20)
     private DividaStatus status;
 
+
     @OneToMany(mappedBy = "divida", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    @JsonIgnore
     private List<Parcela> parcelas = new ArrayList<>();
 }

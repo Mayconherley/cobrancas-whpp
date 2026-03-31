@@ -43,8 +43,8 @@ public class ClienteController {
         return clienteService.atualizar(id, request);
     }
 
+
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletar(@PathVariable Long id) {
         clienteService.deletar(id);
     }

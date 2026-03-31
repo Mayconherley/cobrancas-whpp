@@ -5,6 +5,9 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "loja")
 @Getter
@@ -41,4 +44,7 @@ public class Loja {
     @Builder.Default
     @Column(nullable = false)
     private Boolean receberResumoWhatsapp = true;
+
+    @OneToMany(mappedBy = "loja", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Cliente> clientes = new ArrayList<>();
 }
