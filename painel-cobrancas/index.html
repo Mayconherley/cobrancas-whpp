@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Lojas</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>🏪 Cadastro de Lojas</h1>
+
+    <div class="form">
+        <input type="hidden" id="lojaId">
+
+        <input type="text" id="nome" placeholder="Nome da loja">
+        <input type="text" id="nomeResponsavel" placeholder="Nome do responsável">
+        <input type="tel" id="telefoneWhatsapp" placeholder="Telefone WhatsApp">
+        <input type="email" id="email" placeholder="E-mail">
+
+        <label>
+            <input type="checkbox" id="ativo" checked>
+            Loja ativa
+        </label>
+
+        <label>
+            <input type="checkbox" id="receberResumoWhatsapp" checked>
+            Receber resumo no WhatsApp
+        </label>
+
+        <div class="botoes-form">
+            <button onclick="salvarOuAtualizarLoja()">Salvar</button>
+            <button type="button" onclick="cancelarEdicao()">Cancelar edição</button>
+        </div>
+    </div>
+
+    <hr>
+
+    <h2>📋 Lojas cadastradas</h2>
+    <div id="lista-lojas"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
