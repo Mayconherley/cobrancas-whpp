@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Clientes</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<h1>👤 Cadastro de Clientes</h1>
+
+<div class="form">
+    <input type="hidden" id="clienteId">
+
+    <input type="text" id="nome" placeholder="Nome do cliente">
+    <input type="text" id="cpf" placeholder="CPF">
+    <input type="text" id="telefone" placeholder="Telefone">
+
+    <label>
+        <input type="checkbox" id="receberNotificacaoWhatsapp" checked>
+        Receber notificação no WhatsApp
+    </label>
+
+    <select id="lojaId">
+        <option value="">Selecione uma loja</option>
+    </select>
+
+    <div class="botoes-form">
+        <button type="button" onclick="salvarCliente()">Salvar</button>
+        <button type="button" onclick="cancelarEdicao()">Cancelar edição</button>
+    </div>
+</div>
+
+<hr>
+
+<h2>📋 Clientes cadastrados</h2>
+<div id="lista-clientes"></div>
+
+<script src="js/clientes.js"></script>
+</body>
+</html>

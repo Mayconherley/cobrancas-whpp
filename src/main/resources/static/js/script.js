@@ -1,5 +1,7 @@
-const BASE_URL = "http://localhost:8080";
-const AUTH = "Basic " + btoa("admin@teste.com:123456");
+const email = "admin@teste.com";
+const senha = "123456";
+
+const auth = "Basic " + btoa(email + ":" + senha);
 
 async function salvarOuAtualizarLoja() {
     const lojaId = document.getElementById("lojaId").value;

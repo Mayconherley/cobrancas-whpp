@@ -26,8 +26,21 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .userDetailsService(usuarioService)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/error").permitAll()
+                        // 🔓 LIBERA FRONTEND
+                        .requestMatchers(
+                                "/",
+                                "/index.html",
+                                "/css/**",
+                                "/js/**"
+                        ).permitAll()
+
+                        // 🔓 libera criação do primeiro admin
                         .requestMatchers(HttpMethod.POST, "/usuarios/primeiro-admin").permitAll()
+
+                        // 🔓 libera página de erro
+                        .requestMatchers("/error").permitAll()
+
+                        // 🔒 resto protegido
                         .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults());
